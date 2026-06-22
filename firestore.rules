@@ -1,0 +1,13 @@
+rules_version = '2';
+
+// ⚠️ OPEN RULES — anyone with the project config can read AND write every
+// project document. Chosen for a no-auth single-user setup. Do NOT use this for
+// shared/production data. To lock down later, add Firebase Auth and gate
+// `projects/{id}` on `request.auth != null` (and ideally an owner uid field).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /projects/{projectId} {
+      allow read, write: if true;
+    }
+  }
+}
