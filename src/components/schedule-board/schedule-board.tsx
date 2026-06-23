@@ -50,7 +50,7 @@ export function ScheduleBoard() {
         </Button>
       </div>
 
-      <div className="overflow-x-auto rounded-md border border-slate-200">
+      <div className="max-h-[70vh] overflow-auto rounded-md border border-slate-200">
         <table className="border-collapse">
           <BoardTimelineHeader
             weeks={weeks}

@@ -13,7 +13,9 @@ function task(id: string, order: number, est: Record<string, number>): Task {
 }
 
 describe("generateSegments", () => {
-  const config = createDefaultProjectConfig(); // 5 days/week, 10 units/day, skip 0.5d
+  // Pin to a Monday so week 0 is a full week (default startDate is "today",
+  // whose weekday would otherwise make these assertions date-dependent).
+  const config = { ...createDefaultProjectConfig(), startDate: "2026-06-22" }; // Mon, 5d/wk, 10u/d, skip 0.5d
 
   it("duration uses MAX role estimate, not sum", () => {
     const segs = generateSegments([task("A", 1, { backend: 3, frontend: 2, qc: 1 })], config, ROLE_KEYS);
@@ -61,5 +63,28 @@ describe("generateSegments", () => {
       ROLE_KEYS
     );
     expect(segs[0].taskId).toBe("early");
+  });
+
+  it("mid-week start: week 0 has only the remaining working days", () => {
+    // Wednesday start blocks 2 days (20 units), leaving 3 days in week 0.
+    // A=4d must split: 3d in week 0 (offset 20), 1d into week 1.
+    const wed = { ...config, startDate: "2026-06-24" }; // Wed
+    const segs = generateSegments([task("A", 1, { backend: 4 })], wed, ROLE_KEYS);
+    expect(segs).toHaveLength(2);
+    expect(segs[0].weekIndex).toBe(0);
+    expect(segs[0].offsetUnits).toBe(20); // starts after the 2 blocked days
+    expect(segs[0].durationUnits).toBe(30); // 3 remaining days
+    expect(segs[1].weekIndex).toBe(1);
+    expect(segs[1].offsetUnits).toBe(0);
+    expect(segs[1].durationUnits).toBe(10); // last day spills to week 1
+  });
+
+  it("mid-week start: first task begins at the start-day offset", () => {
+    const wed = { ...config, startDate: "2026-06-24" }; // Wed → offset 20
+    const segs = generateSegments([task("A", 1, { backend: 1 })], wed, ROLE_KEYS);
+    expect(segs).toHaveLength(1);
+    expect(segs[0].weekIndex).toBe(0);
+    expect(segs[0].offsetUnits).toBe(20);
+    expect(segs[0].durationUnits).toBe(10);
   });
 });

@@ -16,6 +16,19 @@ export function snapToWeekStart(date: Date): Date {
   return d;
 }
 
+// Working-day offset of startDate within its own (Mon-based) week.
+// 0 = Monday start (full week). A Wednesday start returns 2, so week 0 has only
+// the remaining working days available — tasks pack into those, not a full week.
+// Clamped to workingDaysPerWeek (a weekend start blocks the whole first week).
+export function leadingWorkingDayOffset(
+  iso: string,
+  workingDaysPerWeek: number
+): number {
+  const day = parseIsoDate(iso).getDay(); // 0 Sun .. 6 Sat
+  const sinceMonday = (day + 6) % 7;
+  return Math.min(sinceMonday, Math.max(0, workingDaysPerWeek));
+}
+
 export function addDays(date: Date, days: number): Date {
   const d = new Date(date);
   d.setDate(d.getDate() + days);

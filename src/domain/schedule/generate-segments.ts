@@ -2,6 +2,7 @@ import type { Task } from "@/types/task";
 import type { ProjectConfig } from "@/types/project";
 import type { ScheduleSegment } from "@/types/schedule";
 import { getTaskDurationUnits } from "@/domain/schedule/task-duration";
+import { leadingWorkingDayOffset } from "@/utils/week-calendar";
 
 // Core packing algorithm (requirements §10.6).
 // Sorts enabled tasks by scheduleOrder, then fills sequential week capacity,
@@ -17,6 +18,13 @@ export function generateSegments(
   const weekCapacity = config.workingDaysPerWeek * config.unitPerDay;
   const skipThreshold = config.skipThresholdDays * config.unitPerDay;
   if (weekCapacity <= 0) return segments;
+
+  // Mid-week start: block the leading working days of week 0 so tasks pack into
+  // the remaining days only (e.g. a Wednesday start leaves 3 days, not 5). The
+  // week column stays full-width; bars begin at the correct weekday offset.
+  weekUsed[0] =
+    leadingWorkingDayOffset(config.startDate, config.workingDaysPerWeek) *
+    config.unitPerDay;
 
   const sorted = tasks
     .filter((t) => t.enabled)
