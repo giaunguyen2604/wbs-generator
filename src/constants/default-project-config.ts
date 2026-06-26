@@ -20,7 +20,23 @@ export function createDefaultProjectConfig(name = "Untitled Project"): ProjectCo
     skipThresholdDays: 0.5,
     unitPerDay: 10,
     displayMonths: 3,
+    scheduleMode: "waterfall",
+    feUiRatio: 0.6,
     roles: createDefaultRoles(),
+  };
+}
+
+// Backfill config fields added after a project was first saved, so older
+// Firestore/JSON payloads stay valid (controlled inputs, correct routing).
+export function withConfigDefaults(data: ProjectData): ProjectData {
+  const p = data.project;
+  return {
+    ...data,
+    project: {
+      ...p,
+      scheduleMode: p.scheduleMode ?? "waterfall",
+      feUiRatio: typeof p.feUiRatio === "number" ? p.feUiRatio : 0.6,
+    },
   };
 }
 

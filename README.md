@@ -10,7 +10,8 @@ The app is designed for project managers and tech leads who currently maintain W
 - TSV import from Google Sheets with preview, column mapping, replace, and append flows.
 - Direct grid paste/copy for round trips with Sheets.
 - Per-role estimates for Backend, Frontend, QC, BrS, and custom roles.
-- Automatic task duration based on the max enabled role estimate.
+- Two schedule modes: waterfall (max of role estimates) and parallel-track (Backend / Frontend / QC as parallel resource lanes, where Frontend starts UI work before the backend finishes and integrates afterward).
+- Configurable FE UI ratio (default 60% UI / 40% integration) for parallel-track mode.
 - Weekly schedule board with month/week headers, task bars, group colors, and a today marker.
 - Drag reorder for schedule order.
 - Undo/redo for project and task changes.

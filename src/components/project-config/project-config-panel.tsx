@@ -1,4 +1,6 @@
+import type { ScheduleMode } from "@/types/project";
 import { useProjectStore } from "@/store/use-project-store";
+import { clampRatio } from "@/domain/schedule/parallel-track-jobs";
 import { LabeledField, inputClass } from "@/components/ui/labeled-field";
 import { RoleSettings } from "@/components/project-config/role-settings";
 
@@ -93,6 +95,33 @@ export function ProjectConfigPanel() {
             className={inputClass}
           />
         </LabeledField>
+
+        <LabeledField label="Schedule mode" htmlFor="cfg-sched-mode" hint="Waterfall = max(roles); Parallel = BE/FE/QC lanes">
+          <select
+            id="cfg-sched-mode"
+            value={project.scheduleMode}
+            onChange={(e) => updateConfig({ scheduleMode: e.target.value as ScheduleMode })}
+            className={inputClass}
+          >
+            <option value="waterfall">Waterfall (max)</option>
+            <option value="parallel-track">Parallel track (BE/FE)</option>
+          </select>
+        </LabeledField>
+
+        {project.scheduleMode === "parallel-track" && (
+          <LabeledField label="FE UI ratio" htmlFor="cfg-fe-ratio" hint="Share of FE done before BE (rest = integration)">
+            <input
+              id="cfg-fe-ratio"
+              type="number"
+              step={0.05}
+              min={0}
+              max={1}
+              value={project.feUiRatio}
+              onChange={(e) => updateConfig({ feUiRatio: clampRatio(num(e.target.value, 0.6)) })}
+              className={inputClass}
+            />
+          </LabeledField>
+        )}
       </div>
 
       <RoleSettings />

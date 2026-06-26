@@ -28,11 +28,14 @@ export function buildWeekColumns(
   const columns: WeekColumn[] = [];
   for (let i = 0; i < weekCount; i++) {
     const { startDate, endDate } = weekDateRange(start, i, config.workingDaysPerWeek);
+    // Assign the week's month/label by its LAST working day, so a week spilling
+    // into the next month (e.g. 29/06–03/07) is grouped as W1 of that month, not
+    // the trailing week of the previous one.
     columns.push({
       weekIndex: i,
-      year: startDate.getFullYear(),
-      month: startDate.getMonth() + 1,
-      weekOfMonth: weekOfMonth(startDate),
+      year: endDate.getFullYear(),
+      month: endDate.getMonth() + 1,
+      weekOfMonth: weekOfMonth(endDate),
       startDate,
       endDate,
       usedUnits: usedByWeek.get(i) ?? 0,

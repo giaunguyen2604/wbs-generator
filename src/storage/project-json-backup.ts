@@ -1,4 +1,5 @@
 import type { ProjectData } from "@/types/project";
+import { withConfigDefaults } from "@/constants/default-project-config";
 
 // Export a project to a downloadable JSON string (backup, §15.4).
 export function serializeProject(data: ProjectData): string {
@@ -18,7 +19,7 @@ export function parseProjectBackup(json: string): ProjectData {
   if (parsed.version !== 1) {
     throw new Error(`Unsupported project file version: ${String(parsed.version)}.`);
   }
-  return parsed;
+  return withConfigDefaults(parsed);
 }
 
 // Trigger a browser download of the given text content.

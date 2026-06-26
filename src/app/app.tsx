@@ -6,6 +6,7 @@ import { TaskTable } from "@/components/task-table/task-table";
 import { ScheduleBoard } from "@/components/schedule-board/schedule-board";
 import { ImportSheetDialog } from "@/components/import-sheet/import-sheet-dialog";
 import { ConfirmDialogHost } from "@/components/ui/confirm-dialog";
+import { PasscodeGate } from "@/components/passcode-gate/passcode-gate";
 import { useAutosave } from "@/hooks/use-autosave";
 import { useUndoRedoShortcuts } from "@/hooks/use-undo-redo";
 import { useFirestoreBootstrap } from "@/hooks/use-firestore-bootstrap";
@@ -21,13 +22,16 @@ export function App() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-full items-center justify-center text-sm text-slate-500">
-        Loading projects…
-      </div>
+      <PasscodeGate>
+        <div className="flex min-h-full items-center justify-center text-sm text-slate-500">
+          Loading projects…
+        </div>
+      </PasscodeGate>
     );
   }
 
   return (
+    <PasscodeGate>
     <div className="min-h-full">
       <AppToolbar />
 
@@ -48,5 +52,6 @@ export function App() {
       <ImportSheetDialog open={importOpen} onClose={() => setImportOpen(false)} />
       <ConfirmDialogHost />
     </div>
+    </PasscodeGate>
   );
 }

@@ -6,6 +6,8 @@ import { colorForGroup } from "@/utils/group-color";
 import { BoardTimelineHeader } from "@/components/schedule-board/board-timeline-header";
 import { BoardTaskRow } from "@/components/schedule-board/board-task-row";
 import { BoardEmptyState } from "@/components/schedule-board/board-empty-state";
+import { BoardTrackLegend } from "@/components/schedule-board/board-track-legend";
+import { buildTrackColors } from "@/components/schedule-board/board-track-lanes";
 import { DENSITY_WIDTH, type Density, todayWeekIndex } from "@/components/schedule-board/board-layout";
 import { Button } from "@/components/ui/button";
 
@@ -29,25 +31,30 @@ export function ScheduleBoard() {
 
   const todayIdx = useMemo(() => todayWeekIndex(weeks, new Date()), [weeks]);
   const cellWidth = DENSITY_WIDTH[density];
+  const mode = project.scheduleMode;
+  const trackColors = useMemo(() => buildTrackColors(project.roles), [project.roles]);
 
   if (rows.length === 0) return <BoardEmptyState />;
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-end gap-2 text-xs text-slate-500">
-        <span>Density:</span>
-        <Button
-          variant={density === "compact" ? "primary" : "secondary"}
-          onClick={() => setDensity("compact")}
-        >
-          Compact
-        </Button>
-        <Button
-          variant={density === "comfortable" ? "primary" : "secondary"}
-          onClick={() => setDensity("comfortable")}
-        >
-          Comfortable
-        </Button>
+      <div className="flex items-center justify-between gap-2 text-xs text-slate-500">
+        {mode === "parallel-track" ? <BoardTrackLegend colors={trackColors} /> : <span />}
+        <div className="flex items-center gap-2">
+          <span>Density:</span>
+          <Button
+            variant={density === "compact" ? "primary" : "secondary"}
+            onClick={() => setDensity("compact")}
+          >
+            Compact
+          </Button>
+          <Button
+            variant={density === "comfortable" ? "primary" : "secondary"}
+            onClick={() => setDensity("comfortable")}
+          >
+            Comfortable
+          </Button>
+        </div>
       </div>
 
       <div className="max-h-[70vh] overflow-auto rounded-md border border-slate-200">
@@ -71,6 +78,8 @@ export function ScheduleBoard() {
                 unitPerDay={project.unitPerDay}
                 weekCapacityUnits={weekCapacityUnits}
                 segments={segmentsByTask.get(task.id)}
+                mode={mode}
+                trackColors={trackColors}
               />
             ))}
           </tbody>

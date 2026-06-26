@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase/firebase-app";
 import type { ProjectData, ProjectListItem } from "@/types/project";
+import { withConfigDefaults } from "@/constants/default-project-config";
 
 // Async persistence layer backed by Firestore (replaces localStorage).
 // One document per project, keyed by project.id, in the `projects` collection.
@@ -30,7 +31,7 @@ export async function fetchProjectList(): Promise<ProjectListItem[]> {
 // Load one full project payload, or null if it does not exist.
 export async function fetchProject(id: string): Promise<ProjectData | null> {
   const snap = await getDoc(projectDoc(id));
-  return snap.exists() ? (snap.data() as ProjectData) : null;
+  return snap.exists() ? withConfigDefaults(snap.data() as ProjectData) : null;
 }
 
 // Create or overwrite a project document.

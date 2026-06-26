@@ -10,6 +10,7 @@
     "lint": "tsc -b --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "seed:passcode": "node scripts/seed-passcode.mjs",
     "predeploy": "bun run build && cp dist/index.html dist/200.html",
     "deploy": "surge dist --domain wbs-gen.surge.sh"
   },

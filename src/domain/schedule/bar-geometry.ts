@@ -15,17 +15,21 @@ export function barGeometry(
 }
 
 // Group segments by taskId then weekIndex for quick cell lookup in the board.
+// A cell holds an array because parallel-track mode renders multiple lanes
+// (BE / FE / QC) in the same week; waterfall mode yields a single-element array.
 export function indexSegmentsByTaskWeek(
   segments: ScheduleSegment[]
-): Map<string, Map<number, ScheduleSegment>> {
-  const map = new Map<string, Map<number, ScheduleSegment>>();
+): Map<string, Map<number, ScheduleSegment[]>> {
+  const map = new Map<string, Map<number, ScheduleSegment[]>>();
   for (const s of segments) {
     let inner = map.get(s.taskId);
     if (!inner) {
       inner = new Map();
       map.set(s.taskId, inner);
     }
-    inner.set(s.weekIndex, s);
+    const cell = inner.get(s.weekIndex);
+    if (cell) cell.push(s);
+    else inner.set(s.weekIndex, [s]);
   }
   return map;
 }
